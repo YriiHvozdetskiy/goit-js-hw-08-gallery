@@ -63,20 +63,21 @@ const images = [
 const refs = {
     gallaryList: document.querySelector('.js-gallery'),
     modal: document.querySelector('.js-lightbox'),
+    imageModal: document.querySelector('[data-action="image"]'),
     closeBtnModal: document.querySelector('[data-action="close-lightbox"]'),
 };
 
 function makeGallaryList(images) {
     const gallaryList = images
         .map(
-            ({ original, preview }) =>
+            ({ original, preview, description }) =>
                 `<li class="gallery__item">
                     <a class="gallery__link" href="#">
                         <img 
                             class="gallery__image"
                             src="${preview}"
                             data-source="${original}"
-                            alt="Tulips"/>
+                            alt="${description}"/>
                     </a>
                 </li>
                  `,
@@ -88,22 +89,32 @@ function makeGallaryList(images) {
 
 makeGallaryList(images);
 
-const imageModalRef = refs.modal.querySelector('[data-action="image"]');
-
 refs.gallaryList.addEventListener('click', onGallaryList);
+
+let currentImageSrc = '';
 
 function onGallaryList(e) {
     if (e.target.nodeName !== 'IMG') {
         return;
     }
+
+    currentImageSrc = e.target.dataset.source;
+    refs.imageModal.src = currentImageSrc;
     openModal();
+}
 
-    imageModalRef.src = e.target.dataset.source;
+let imgGallaryIndex = 0;
+const imagesSrc = [];
 
-    // const imageArr = images.map((img) => img.original);
-    // console.log(imageArr.indexOf(e.target.dataset.source));
-
-    // console.log(e.target.dataset.source);
+function closeModal() {
+    refs.modal.classList.remove('is-open');
+    refs.closeBtnModal.removeEventListener('click', closeModal);
+    window.removeEventListener('keydown', onKeydownClose);
+    refs.modal.removeEventListener('click', onOverlay);
+    window.removeEventListener('keydown', onFlipSlides);
+    refs.imageModal.src = '';
+    currentImageSrc = '';
+    imagesSrc.length = 0;
 }
 
 function openModal() {
@@ -112,14 +123,15 @@ function openModal() {
     refs.closeBtnModal.addEventListener('click', closeModal);
     refs.modal.addEventListener('click', onOverlay);
     window.addEventListener('keydown', onKeydownClose);
-}
+    window.addEventListener('keydown', onFlipSlides);
 
-function closeModal() {
-    refs.modal.classList.remove('is-open');
-    refs.closeBtnModal.removeEventListener('click', closeModal);
-    window.removeEventListener('keydown', onKeydownClose);
-    refs.modal.removeEventListener('click', onOverlay);
-    imageModalRef.src = '';
+    const imagesGallary = refs.gallaryList.querySelectorAll('.gallery__image');
+    console.log(imagesGallary);
+
+    imagesGallary.forEach((el) => imagesSrc.push(el.dataset.source));
+    console.log(imagesSrc);
+
+    imgGallaryIndex = imagesSrc.indexOf(currentImageSrc);
 }
 
 function onKeydownClose(e) {
@@ -127,14 +139,25 @@ function onKeydownClose(e) {
 }
 
 function onOverlay(e) {
-    if (e.target !== imageModalRef) closeModal();
+    if (e.target !== refs.imageModal) closeModal();
 }
 
-window.addEventListener('keydown', onFlipSlides);
-
 function onFlipSlides(e) {
-    if (e.code === 'ArrowRight') {
-        // console.log(e.target.dataset.src);
+    if (e.code === 'ArrowLeft') {
+        imgGallaryIndex -= 1;
+        console.log(imgGallaryIndex);
+
+        if (imgGallaryIndex === -1) {
+            imgGallaryIndex = imagesSrc.length - 1;
+        }
     }
-    console.log(e.code);
+
+    if (e.code === 'ArrowRight') {
+        imgGallaryIndex += 1;
+        console.log(imgGallaryIndex);
+        if (imgGallaryIndex === imagesSrc.length) {
+            imgGallaryIndex = 0;
+        }
+    }
+    refs.imageModal.src = imagesSrc[imgGallaryIndex];
 }
