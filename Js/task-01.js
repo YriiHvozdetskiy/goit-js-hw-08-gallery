@@ -68,6 +68,7 @@ const refs = {
 };
 
 const imagesSrc = [];
+const imagesAlt = [];
 
 function makeGallaryList(images) {
     const gallaryList = images
@@ -93,6 +94,8 @@ function makeGallaryList(images) {
 
     imagesGallary.forEach((el) => imagesSrc.push(el.dataset.source));
     console.log(imagesSrc);
+    imagesGallary.forEach((el) => imagesAlt.push(el.getAttribute('alt')));
+    console.log(imagesAlt);
 }
 
 makeGallaryList(images);
@@ -100,9 +103,14 @@ makeGallaryList(images);
 refs.gallaryList.addEventListener('click', onGallaryList);
 
 let currentImageSrc = '';
+let currentImageAlt = '';
 
-function updateDate(targetSrc) {
+function updateDateSrc(targetSrc) {
     return (currentImageSrc = targetSrc);
+}
+
+function updateDateAlt(targetSrc) {
+    return (currentImageAlt = targetSrc);
 }
 
 function onGallaryList(e) {
@@ -110,12 +118,14 @@ function onGallaryList(e) {
         return;
     }
 
-    refs.imageModal.src = updateDate(e.target.dataset.source);
+    refs.imageModal.src = updateDateSrc(e.target.dataset.source);
+    refs.imageModal.alt = updateDateAlt(e.target.getAttribute('alt'));
 
     openModal();
 }
 
 let imgGallaryIndex = 0;
+let altGallaryIndex = 0;
 
 function closeModal() {
     refs.modal.classList.remove('is-open');
@@ -124,6 +134,7 @@ function closeModal() {
     refs.modal.removeEventListener('click', onOverlay);
     window.removeEventListener('keydown', onFlipSlides);
     refs.imageModal.src = '';
+    refs.imageModal.alt = '';
 }
 
 function openModal() {
@@ -135,6 +146,7 @@ function openModal() {
     window.addEventListener('keydown', onFlipSlides);
 
     imgGallaryIndex = imagesSrc.indexOf(currentImageSrc);
+    altGallaryIndex = imagesAlt.indexOf(currentImageAlt);
 }
 
 function onKeydownClose(e) {
@@ -148,19 +160,30 @@ function onOverlay(e) {
 function onFlipSlides(e) {
     if (e.code === 'ArrowLeft') {
         imgGallaryIndex -= 1;
-        console.log(imgGallaryIndex);
+        altGallaryIndex -= 1;
+        console.log('imgGallaryIndex', imgGallaryIndex);
+        console.log('altGallaryIndex', altGallaryIndex);
 
         if (imgGallaryIndex === -1) {
             imgGallaryIndex = imagesSrc.length - 1;
+        }
+        if (altGallaryIndex === -1) {
+            altGallaryIndex = imagesAlt.length - 1;
         }
     }
 
     if (e.code === 'ArrowRight') {
         imgGallaryIndex += 1;
-        console.log(imgGallaryIndex);
+        altGallaryIndex += 1;
+        console.log('imgGallaryIndex', imgGallaryIndex);
+        console.log('altGallaryIndex', altGallaryIndex);
         if (imgGallaryIndex === imagesSrc.length) {
             imgGallaryIndex = 0;
         }
+        if (altGallaryIndex === imagesAlt.length) {
+            altGallaryIndex = 0;
+        }
     }
     refs.imageModal.src = imagesSrc[imgGallaryIndex];
+    refs.imageModal.alt = imagesAlt[altGallaryIndex];
 }
