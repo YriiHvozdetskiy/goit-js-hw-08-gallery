@@ -67,6 +67,8 @@ const refs = {
     closeBtnModal: document.querySelector('[data-action="close-lightbox"]'),
 };
 
+const imagesSrc = [];
+
 function makeGallaryList(images) {
     const gallaryList = images
         .map(
@@ -85,6 +87,12 @@ function makeGallaryList(images) {
         .join('');
 
     refs.gallaryList.innerHTML = gallaryList;
+
+    const imagesGallary = refs.gallaryList.querySelectorAll('.gallery__image');
+    console.log(imagesGallary);
+
+    imagesGallary.forEach((el) => imagesSrc.push(el.dataset.source));
+    console.log(imagesSrc);
 }
 
 makeGallaryList(images);
@@ -93,6 +101,8 @@ refs.gallaryList.addEventListener('click', onGallaryList);
 
 let currentImageSrc = '';
 
+function updateDate() {}
+
 function onGallaryList(e) {
     if (e.target.nodeName !== 'IMG') {
         return;
@@ -100,11 +110,11 @@ function onGallaryList(e) {
 
     currentImageSrc = e.target.dataset.source;
     refs.imageModal.src = currentImageSrc;
+
     openModal();
 }
 
 let imgGallaryIndex = 0;
-const imagesSrc = [];
 
 function closeModal() {
     refs.modal.classList.remove('is-open');
@@ -114,7 +124,6 @@ function closeModal() {
     window.removeEventListener('keydown', onFlipSlides);
     refs.imageModal.src = '';
     currentImageSrc = '';
-    imagesSrc.length = 0;
 }
 
 function openModal() {
@@ -124,12 +133,6 @@ function openModal() {
     refs.modal.addEventListener('click', onOverlay);
     window.addEventListener('keydown', onKeydownClose);
     window.addEventListener('keydown', onFlipSlides);
-
-    const imagesGallary = refs.gallaryList.querySelectorAll('.gallery__image');
-    console.log(imagesGallary);
-
-    imagesGallary.forEach((el) => imagesSrc.push(el.dataset.source));
-    console.log(imagesSrc);
 
     imgGallaryIndex = imagesSrc.indexOf(currentImageSrc);
 }
