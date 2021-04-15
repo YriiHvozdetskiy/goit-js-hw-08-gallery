@@ -101,15 +101,16 @@ refs.gallaryList.addEventListener('click', onGallaryList);
 
 let currentImageSrc = '';
 
-function updateDate() {}
+function updateDate(targetSrc) {
+    return (currentImageSrc = targetSrc);
+}
 
 function onGallaryList(e) {
     if (e.target.nodeName !== 'IMG') {
         return;
     }
 
-    currentImageSrc = e.target.dataset.source;
-    refs.imageModal.src = currentImageSrc;
+    refs.imageModal.src = updateDate(e.target.dataset.source);
 
     openModal();
 }
@@ -123,7 +124,6 @@ function closeModal() {
     refs.modal.removeEventListener('click', onOverlay);
     window.removeEventListener('keydown', onFlipSlides);
     refs.imageModal.src = '';
-    currentImageSrc = '';
 }
 
 function openModal() {
