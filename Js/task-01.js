@@ -90,12 +90,10 @@ function makeGallaryList(images) {
     refs.gallaryList.innerHTML = gallaryList;
 
     const imagesGallary = refs.gallaryList.querySelectorAll('.gallery__image');
-    console.log(imagesGallary);
 
     imagesGallary.forEach((el) => imagesSrc.push(el.dataset.source));
-    console.log(imagesSrc);
+
     imagesGallary.forEach((el) => imagesAlt.push(el.getAttribute('alt')));
-    console.log(imagesAlt);
 }
 
 makeGallaryList(images);
@@ -105,12 +103,16 @@ refs.gallaryList.addEventListener('click', onGallaryList);
 let currentImageSrc = '';
 let currentImageAlt = '';
 
-function updateDateSrc(targetSrc) {
-    return (currentImageSrc = targetSrc);
-}
+function updateAttr(src = '', alt = '') {
+    if (!src && !alt) {
+        refs.imageModal.src = src;
+        refs.imageModal.alt = alt;
+        return;
+    }
 
-function updateDateAlt(targetSrc) {
-    return (currentImageAlt = targetSrc);
+    if (src) return (currentImageSrc = src);
+
+    if (alt) return (currentImageAlt = alt);
 }
 
 function onGallaryList(e) {
@@ -118,8 +120,9 @@ function onGallaryList(e) {
         return;
     }
 
-    refs.imageModal.src = updateDateSrc(e.target.dataset.source);
-    refs.imageModal.alt = updateDateAlt(e.target.getAttribute('alt'));
+    refs.imageModal.src = updateAttr(e.target.dataset.source);
+
+    refs.imageModal.alt = updateAttr('', e.target.getAttribute('alt'));
 
     openModal();
 }
@@ -133,8 +136,7 @@ function closeModal() {
     window.removeEventListener('keydown', onKeydownClose);
     refs.modal.removeEventListener('click', onOverlay);
     window.removeEventListener('keydown', onFlipSlides);
-    refs.imageModal.src = '';
-    refs.imageModal.alt = '';
+    updateAttr();
 }
 
 function openModal() {
